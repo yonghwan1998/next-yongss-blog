@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Yongss와 이 연구소를 소개합니다.",
+  description: "Yongss와 이 블로그를 소개합니다.",
 };
 
-export default function AboutIndexPage() {
+export default function AboutPage() {
   return (
     <main className="page-shell">
       <p className="page-kicker">About</p>
