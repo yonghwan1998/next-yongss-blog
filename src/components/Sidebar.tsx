@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const navigation = [
   { href: "/", label: "Home" },
@@ -9,6 +12,8 @@ const navigation = [
 ];
 
 export default function Sidebar() {
+  const pathname = usePathname();
+
   return (
     <aside className="sidebar">
       <div className="sidebar-sticky">
@@ -18,11 +23,17 @@ export default function Sidebar() {
           <div><dt>email</dt><dd>—</dd></div>
         </dl>
         <nav className="side-nav" aria-label="주요 메뉴">
-          {navigation.map((item) => (
-            <Link href={item.href} key={item.href}>
-              {item.label}{item.count !== undefined && ` (${item.count})`}
-            </Link>
-          ))}
+          {navigation.map((item) => {
+            const isActive = item.href === "/"
+              ? pathname === "/"
+              : pathname === item.href || pathname.startsWith(`${item.href}/`);
+
+            return (
+              <Link aria-current={isActive ? "page" : undefined} href={item.href} key={item.href}>
+                {item.label}{item.count !== undefined && ` (${item.count})`}
+              </Link>
+            );
+          })}
         </nav>
       </div>
     </aside>
