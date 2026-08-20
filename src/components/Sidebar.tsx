@@ -5,11 +5,12 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 import { labEntries, researchArticles } from "@/data/content";
+import { projectEntries } from "@/data/projects";
 
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
-  { href: "/projects", label: "Projects", count: 0 },
+  { href: "/projects", label: "Projects", count: projectEntries.length },
   { href: "/research", label: "Research", count: researchArticles.length },
   { href: "/labs", label: "Labs", count: labEntries.length },
 ];
