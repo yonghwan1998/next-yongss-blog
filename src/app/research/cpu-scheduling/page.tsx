@@ -105,8 +105,8 @@ export default function CpuSchedulingPage() {
 
           <h3>1. 선입 선처리 스케줄링</h3>
           <p>선입 선처리(FCFS, First-Come First-Served)는 준비 큐에 도착한 순서대로 CPU를 할당하는 비선점형 알고리즘이다. 구현이 단순하고 먼저 온 작업을 먼저 처리한다는 점에서 공평하지만, 실행 시간이 긴 프로세스가 앞에 있으면 짧은 프로세스들이 함께 오래 기다리는 <strong>호위 효과</strong>가 발생할 수 있다.</p>
-          <figure className="article-figure">
-            <Image alt="도착한 순서대로 프로세스 A, B, C, D를 실행하는 선입 선처리 스케줄링" height={512} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/fcfs.png" width={2112} />
+          <figure className="article-figure article-diagram">
+            <Image alt="도착한 순서대로 프로세스 A, B, C, D를 실행하는 선입 선처리 스케줄링" height={900} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/fcfs.png" unoptimized width={1600} />
             <figcaption>실행 시간이 아니라 준비 큐에 들어온 순서가 CPU 할당 순서를 결정한다.</figcaption>
           </figure>
 
@@ -120,16 +120,16 @@ export default function CpuSchedulingPage() {
           <h3>3. 라운드 로빈 스케줄링</h3>
           <p>라운드 로빈(Round Robin)은 준비 큐의 순서대로 CPU를 할당하되, 각 프로세스가 정해진 타임 슬라이스만큼만 실행하도록 제한하는 선점형 알고리즘이다. 시간 안에 끝나지 않은 프로세스는 준비 큐의 맨 뒤로 이동한다.</p>
           <p>타임 슬라이스가 너무 크면 FCFS와 비슷해져 응답성이 낮아지고, 너무 작으면 문맥 교환이 잦아져 실제 작업보다 전환 비용이 커질 수 있다. 따라서 응답 시간과 문맥 교환 비용 사이의 균형이 중요하다.</p>
-          <figure className="article-figure">
-            <Image alt="타임 슬라이스 10밀리초 단위로 여러 프로세스를 순환 실행하는 라운드 로빈 스케줄링" height={768} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/round-robin.png" width={1408} />
+          <figure className="article-figure article-diagram">
+            <Image alt="타임 슬라이스 10밀리초 단위로 여러 프로세스를 순환 실행하는 라운드 로빈 스케줄링" height={900} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/round-robin.png" unoptimized width={1600} />
             <figcaption>타임 슬라이스가 끝난 프로세스는 준비 큐의 뒤로 이동해 다음 차례를 기다린다.</figcaption>
           </figure>
 
           <h3>4. 최소 잔여 시간 우선 스케줄링</h3>
           <p>최소 잔여 시간 우선(SRTF, Shortest Remaining Time First)은 SJF의 선점형 형태다. 프로세스가 새로 도착하는 등 스케줄링이 필요한 시점마다 실행 중인 프로세스와 준비 큐의 프로세스가 가진 남은 시간을 비교한다. 새 프로세스의 남은 시간이 더 짧다면 현재 프로세스를 선점하고 새 프로세스를 실행한다.</p>
           <p>평균 대기 시간을 줄이는 데 유리하지만 남은 시간을 계속 추정해야 하며, 긴 작업은 반복해서 밀려 기아 상태에 빠질 수 있다.</p>
-          <figure className="article-figure">
-            <Image alt="프로세스 A 실행 중 남은 시간이 더 짧은 프로세스 C가 도착해 CPU를 선점하는 최소 잔여 시간 우선 스케줄링" height={512} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/srtf.png" width={2112} />
+          <figure className="article-figure article-diagram">
+            <Image alt="프로세스 A 실행 중 남은 시간이 더 짧은 프로세스 C가 도착해 CPU를 선점하는 최소 잔여 시간 우선 스케줄링" height={900} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/srtf.png" unoptimized width={1600} />
             <figcaption>새로 도착한 C의 실행 시간이 A의 남은 시간보다 짧아 선점이 발생한다.</figcaption>
           </figure>
 
@@ -144,16 +144,16 @@ export default function CpuSchedulingPage() {
           <h3>6. 다단계 큐 스케줄링</h3>
           <p>다단계 큐(Multilevel Queue)는 프로세스 유형이나 우선순위에 따라 준비 큐를 여러 개로 분리하는 방식이다. 시스템, 대화형, 배치 프로세스처럼 성격이 다른 작업을 서로 다른 큐에 넣고 각 큐에 라운드 로빈이나 FCFS 같은 별도의 알고리즘을 적용할 수 있다.</p>
           <p>큐 사이에도 고정 우선순위 또는 일정한 CPU 시간 비율을 적용한다. 전형적인 다단계 큐에서는 프로세스가 처음 배정된 큐에 계속 머물며, 큐 사이 이동을 허용해 동적으로 우선순위를 바꾸면 다단계 피드백 큐에 가까워진다.</p>
-          <figure className="article-figure">
-            <Image alt="시스템, 대화형, 배치, 백그라운드 프로세스를 우선순위별 준비 큐로 분리한 다단계 큐 스케줄링" height={768} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/multilevel-queue.png" width={1408} />
+          <figure className="article-figure article-diagram">
+            <Image alt="시스템, 대화형, 배치, 백그라운드 프로세스를 우선순위별 준비 큐로 분리한 다단계 큐 스케줄링" height={900} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/multilevel-queue.png" unoptimized width={1600} />
             <figcaption>프로세스 유형별로 큐를 분리하고 각 큐의 목적에 맞는 스케줄링 알고리즘을 적용한다.</figcaption>
           </figure>
 
           <h3>7. 다단계 피드백 큐 스케줄링</h3>
           <p>다단계 피드백 큐(MLFQ, Multilevel Feedback Queue)는 프로세스가 큐 사이를 이동할 수 있게 해 우선순위를 동적으로 조정한다. 새 프로세스는 보통 높은 우선순위 큐에서 시작한다. 주어진 타임 슬라이스를 모두 사용한 CPU 집중 프로세스는 더 낮은 큐로 내려가고, 짧게 실행한 뒤 입출력을 요청하는 대화형 프로세스는 높은 우선순위를 유지한다.</p>
           <p>하위 큐에서 너무 오래 기다린 프로세스를 주기적으로 승격하면 기아를 방지할 수 있다. MLFQ는 실제 CPU 버스트 길이를 미리 알지 못해도 프로세스의 실행 행동을 관찰해 짧은 작업과 대화형 작업에 빠른 응답을 제공한다.</p>
-          <figure className="article-figure">
-            <Image alt="서로 다른 타임 슬라이스를 가진 여러 큐 사이에서 프로세스가 강등되거나 승격되는 다단계 피드백 큐 스케줄링" height={512} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/multilevel-feedback-queue.png" width={2112} />
+          <figure className="article-figure article-diagram">
+            <Image alt="서로 다른 타임 슬라이스를 가진 여러 큐 사이에서 프로세스가 강등되거나 승격되는 다단계 피드백 큐 스케줄링" height={900} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/multilevel-feedback-queue.png" unoptimized width={1600} />
             <figcaption>CPU를 오래 쓰면 하위 큐로 강등하고, 오래 기다린 작업은 상위 큐로 승격해 우선순위를 조정한다.</figcaption>
           </figure>
         </section>
