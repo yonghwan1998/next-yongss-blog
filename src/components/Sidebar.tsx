@@ -4,12 +4,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { labEntries, researchArticles } from "@/data/content";
+
 const navigation = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/projects", label: "Projects", count: 0 },
-  { href: "/research", label: "Research", count: 2 },
-  { href: "/labs", label: "Labs", count: 3 },
+  { href: "/research", label: "Research", count: researchArticles.length },
+  { href: "/labs", label: "Labs", count: labEntries.length },
 ];
 
 export default function Sidebar() {

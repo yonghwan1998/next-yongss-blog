@@ -2,27 +2,14 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 
+import { featuredLab, researchArticles } from "@/data/content";
+
 export const metadata: Metadata = {
   title: { absolute: "yongss Blog" },
   description: "개발 원리를 글과 움직이는 실험으로 기록하는 yongss의 기술 블로그입니다.",
 };
 
-const recentResearch = [
-  {
-    category: "Operating System",
-    date: "2026.08.20",
-    description: "CPU·입출력 버스트와 스케줄링 큐부터 주요 CPU 스케줄링 알고리즘까지 정리합니다.",
-    href: "/research/cpu-scheduling",
-    title: "CPU 스케줄링",
-  },
-  {
-    category: "Operating System",
-    date: "2026.08.17",
-    description: "레이스 컨디션부터 뮤텍스·세마포·모니터, 교착 상태 해결 방법까지 정리합니다.",
-    href: "/research/synchronization-and-deadlock",
-    title: "동기화와 교착 상태",
-  },
-] as const;
+const recentResearch = researchArticles.slice(0, 2);
 
 export default function HomePage() {
   return (
@@ -54,7 +41,7 @@ export default function HomePage() {
             <Link className="home-research-card" href={article.href} key={article.href}>
               <span>{article.category} · {article.date}</span>
               <h3>{article.title}</h3>
-              <p>{article.description}</p>
+              <p>{article.homeDescription ?? article.description}</p>
               <strong>읽어보기 <i aria-hidden="true">→</i></strong>
             </Link>
           ))}
@@ -69,22 +56,22 @@ export default function HomePage() {
           </div>
           <Link href="/labs">전체 Labs <span aria-hidden="true">→</span></Link>
         </div>
-        <Link className="home-lab-feature" href="/labs/scheduling-queue">
+        <Link className="home-lab-feature" href={featuredLab.href}>
           <span className="home-lab-content">
-            <small>Operating System · Scheduling</small>
-            <strong>Scheduling Queue</strong>
-            <b>준비·실행·대기 큐의 상태 전이</b>
-            <span>디스패치, 타이머 인터럽트와 입출력 요청에 따라 PCB가 이동하는 과정을 직접 조작할 수 있습니다.</span>
+            <small>{featuredLab.category} · {featuredLab.tags[1]}</small>
+            <strong>{featuredLab.title}</strong>
+            <b>{featuredLab.koreanTitle}</b>
+            <span>{featuredLab.featuredDescription ?? featuredLab.description}</span>
             <i>실험 시작하기 <em aria-hidden="true">→</em></i>
           </span>
           <span className="home-lab-preview">
             <Image
-              alt="프로세스가 준비 큐, CPU, 입출력 대기 큐 사이를 이동하는 애니메이션"
-              height={679}
+              alt={featuredLab.preview.featuredAlt ?? featuredLab.preview.alt}
+              height={featuredLab.preview.height}
               sizes="(max-width: 760px) calc(100vw - 72px), 290px"
-              src="/images/cpu-scheduling/scheduling-queue-demo.gif"
+              src={featuredLab.preview.src}
               unoptimized
-              width={720}
+              width={featuredLab.preview.width}
             />
           </span>
         </Link>
