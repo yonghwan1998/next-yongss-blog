@@ -433,6 +433,72 @@ a { color: inherit; text-decoration: none; }
 .permit-slots div.used { border-style: solid; background: #ffffff; color: #526b43; font-weight: 650; animation: labPermitClaim .5s cubic-bezier(.2,.9,.25,1.15) both; }
 .semaphore-workspace { grid-template-columns: 1fr 1fr; }
 
+.scheduling-summary { display: grid; grid-template-columns: repeat(4,1fr); gap: 7px; margin-bottom: 12px; }
+.scheduling-summary > div { display: flex; align-items: baseline; justify-content: center; gap: 7px; padding: 8px; border: 1px solid #d1d5db; background: #f8fafc; color: #4b5563; font-size: .64rem; }
+.scheduling-summary strong { color: #111827; font-size: 1.15rem; animation: labCounterTick .42s cubic-bezier(.2,.9,.25,1.2) both; }
+.scheduling-board { position: relative; isolation: isolate; display: grid; grid-template: "ready cpu" auto "waiting cpu" 1fr / minmax(0,1.35fr) minmax(190px,.65fr); gap: 10px; min-height: 380px; }
+.schedule-stage { position: relative; z-index: 1; min-width: 0; padding: 12px; border: 1px solid #cbd5e1; background: #f8fafc; }
+.schedule-ready { grid-area: ready; }
+.schedule-waiting { grid-area: waiting; }
+.schedule-cpu { grid-area: cpu; display: flex; flex-direction: column; align-items: center; }
+.schedule-stage-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+.schedule-stage-heading > div { display: grid; gap: 2px; }
+.schedule-stage-heading span { color: #4f772d; font-size: .55rem; font-weight: 800; letter-spacing: .08em; }
+.schedule-stage-heading strong { color: #111827; font-size: .73rem; }
+.schedule-stage-heading > small { color: #6b7280; font-size: .56rem; text-align: right; }
+.schedule-queue-track { position: relative; display: flex; min-height: 70px; overflow-x: auto; border: 1px solid #9ca3af; background: #ffffff; scrollbar-width: thin; }
+.schedule-queue-track.compact { min-height: 62px; }
+.schedule-queue-slot { position: relative; display: grid; flex: 1 0 58px; place-items: center; min-width: 0; border-left: 1px solid #d1d5db; }
+.schedule-queue-slot:first-child { border-left: 0; }
+.schedule-queue-slot > span { width: 100%; height: 100%; }
+.schedule-queue-empty { position: absolute; inset: 0; display: grid; place-items: center; color: #9ca3af; font-size: .59rem; pointer-events: none; }
+.schedule-pcb { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 44px; height: 54px; padding-top: 7px; clip-path: polygon(50% 0,92% 17%,88% 100%,12% 100%,8% 17%); background: #e5e7eb; color: #1f2937; animation: schedulePcbIn .46s cubic-bezier(.2,.9,.25,1.15) both; }
+.schedule-pcb::before { position: absolute; top: 6px; width: 7px; height: 7px; border: 1px solid currentColor; border-radius: 50%; background: #ffffff; content: ""; }
+.schedule-pcb b { font-size: .66rem; line-height: 1; }
+.schedule-pcb small { margin-top: 4px; font-size: .48rem; line-height: 1; }
+.schedule-pcb.waiting { background: #fef3c7; color: #92400e; }
+.schedule-pcb.running { background: #dcebd2; color: #365720; animation: schedulePcbRunning .62s cubic-bezier(.2,.9,.25,1.15) both; }
+.schedule-pcb.done { width: 36px; height: 44px; background: #e5e7eb; color: #6b7280; filter: saturate(.2); }
+.schedule-device-list { display: grid; gap: 8px; }
+.schedule-device-lane { display: grid; grid-template-columns: 104px minmax(0,1fr); gap: 8px; padding: 5px; border: 1px solid transparent; transition: border-color .2s ease, background-color .2s ease; }
+.schedule-device-lane.selected { border-color: #9db58c; background: #f2f7ed; }
+.schedule-device-picker { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: 3px; padding: 7px; border: 0; background: transparent; color: #374151; text-align: left; cursor: pointer; }
+.schedule-device-picker span { font-size: .68rem; font-weight: 750; }
+.schedule-device-picker small { color: #6b7280; font-size: .54rem; }
+.schedule-device-picker:focus-visible { outline: 3px solid rgba(120,152,94,.25); outline-offset: 1px; }
+.schedule-cpu .schedule-stage-heading { align-self: stretch; }
+.schedule-cpu-core { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 148px; height: 148px; margin: 8px auto 18px; border: 1px solid #9ca3af; border-radius: 50%; background: #ffffff; animation: scheduleCpuIn .4s ease both; }
+.schedule-cpu-core > i { position: absolute; inset: 8px; border: 2px solid #d1d5db; border-radius: 50%; }
+.schedule-cpu-core.busy > i { border-color: #4f772d transparent #4f772d #4f772d; animation: scheduleCpuSpin 1.5s linear infinite; }
+.schedule-cpu-core > span { margin-bottom: 8px; color: #4b5563; font-size: .54rem; font-weight: 800; letter-spacing: .1em; }
+.schedule-cpu-core > small { color: #9ca3af; font-size: .58rem; }
+.schedule-completed { width: 100%; margin-top: auto; padding-top: 12px; border-top: 1px solid #d1d5db; }
+.schedule-completed > div:first-child { display: flex; justify-content: space-between; color: #6b7280; font-size: .53rem; font-weight: 750; letter-spacing: .06em; }
+.schedule-completed-list { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; min-height: 50px; margin-top: 7px; }
+.schedule-completed-list > small { color: #9ca3af; font-size: .57rem; }
+.scheduling-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 14px; }
+.schedule-control-group { padding: 10px; border: 1px solid #d1d5db; background: #f8fafc; }
+.schedule-control-group > span { display: block; margin-bottom: 7px; color: #4b5563; font-size: .58rem; font-weight: 750; letter-spacing: .04em; }
+.schedule-control-group > div { display: flex; flex-wrap: wrap; gap: 6px; }
+.schedule-message { margin-bottom: 0; }
+.schedule-motion-layer { position: absolute; inset: 0; z-index: 4; overflow: hidden; pointer-events: none; }
+.schedule-motion-layer.blocked .lab-motion-caption { border-color: #f1c66f; color: #9a5b06; animation: labMotionBlocked .58s ease both; }
+.schedule-motion-layer.ready-to-cpu .primary-move { --motion-start-x: 25%; --motion-start-y: 16%; --motion-end-x: 79%; --motion-end-y: 29%; animation: labMotionTravel .9s cubic-bezier(.35,.05,.2,1) both; }
+.schedule-motion-layer.cpu-to-ready .primary-move { --motion-start-x: 79%; --motion-start-y: 29%; --motion-end-x: 25%; --motion-end-y: 16%; animation: labMotionTravel .9s cubic-bezier(.35,.05,.2,1) both; }
+.schedule-motion-layer.cpu-to-disk .primary-move { --motion-start-x: 79%; --motion-start-y: 29%; --motion-end-x: 28%; --motion-end-y: 57%; animation: labMotionTravel .9s cubic-bezier(.35,.05,.2,1) both; }
+.schedule-motion-layer.cpu-to-printer .primary-move { --motion-start-x: 79%; --motion-start-y: 29%; --motion-end-x: 28%; --motion-end-y: 80%; animation: labMotionTravel .9s cubic-bezier(.35,.05,.2,1) both; }
+.schedule-motion-layer.disk-to-ready .primary-move { --motion-start-x: 28%; --motion-start-y: 57%; --motion-end-x: 25%; --motion-end-y: 16%; animation: labMotionTravel .9s cubic-bezier(.35,.05,.2,1) both; }
+.schedule-motion-layer.printer-to-ready .primary-move { --motion-start-x: 28%; --motion-start-y: 80%; --motion-end-x: 25%; --motion-end-y: 16%; animation: labMotionTravel .9s cubic-bezier(.35,.05,.2,1) both; }
+.schedule-motion-layer.cpu-to-done .primary-move { --motion-start-x: 79%; --motion-start-y: 29%; --motion-end-x: 79%; --motion-end-y: 79%; background: #6b7280; animation: labMotionTravel .72s ease-in both; }
+.schedule-motion-layer.add-ready .primary-move { left: 25%; top: 16%; animation: labMotionAdd .52s cubic-bezier(.2,.9,.25,1.2) both; }
+.schedule-motion-layer.cpu-to-disk .auto-dispatch,
+.schedule-motion-layer.cpu-to-printer .auto-dispatch { --motion-start-x: 25%; --motion-start-y: 16%; --motion-end-x: 79%; --motion-end-y: 29%; background: #111827; animation: labMotionTravel .8s .16s cubic-bezier(.35,.05,.2,1) both; }
+
+@keyframes schedulePcbIn { 0% { opacity: 0; transform: translateY(-7px) scale(.78) rotate(-5deg); } 70% { transform: translateY(0) scale(1.05) rotate(1deg); } 100% { opacity: 1; transform: scale(1) rotate(0); } }
+@keyframes schedulePcbRunning { 0% { opacity: .3; transform: scale(.72); } 65% { transform: scale(1.08); filter: drop-shadow(0 0 5px rgba(79,119,45,.3)); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes scheduleCpuIn { 0% { opacity: .65; transform: scale(.96); } 65% { transform: scale(1.025); } 100% { opacity: 1; transform: scale(1); } }
+@keyframes scheduleCpuSpin { to { transform: rotate(360deg); } }
+
 .lab-motion-layer { position: absolute; inset: 0; z-index: 4; overflow: hidden; pointer-events: none; }
 .lab-motion-badge { position: absolute; display: grid; place-items: center; width: 38px; height: 38px; border: 2px solid #ffffff; border-radius: 50%; background: #365720; box-shadow: 0 5px 16px rgba(30,50,22,.3); color: #ffffff; font-size: .68rem; font-weight: 800; opacity: 0; }
 .lab-motion-badge::after { position: absolute; inset: -6px; border: 1px solid rgba(79,119,45,.38); border-radius: inherit; content: ""; animation: labMotionRing .7s ease-out both; }
@@ -503,6 +569,21 @@ a { color: inherit; text-decoration: none; }
   .condition-grid { grid-template-columns: 1fr; }
   .lab-workspace, .semaphore-workspace { grid-template-columns: 1fr; }
   .lab-resource { min-height: 115px; }
+  .scheduling-summary { grid-template-columns: 1fr 1fr; }
+  .scheduling-board { grid-template: "ready" auto "cpu" auto "waiting" auto / minmax(0,1fr); min-height: 650px; }
+  .schedule-cpu { min-height: 240px; }
+  .schedule-device-lane { grid-template-columns: 90px minmax(0,1fr); }
+  .scheduling-controls { grid-template-columns: 1fr; }
+  .schedule-motion-layer.ready-to-cpu .primary-move { --motion-start-x: 50%; --motion-start-y: 9%; --motion-end-x: 50%; --motion-end-y: 38%; }
+  .schedule-motion-layer.cpu-to-ready .primary-move { --motion-start-x: 50%; --motion-start-y: 38%; --motion-end-x: 50%; --motion-end-y: 9%; }
+  .schedule-motion-layer.cpu-to-disk .primary-move { --motion-start-x: 50%; --motion-start-y: 38%; --motion-end-x: 50%; --motion-end-y: 72%; }
+  .schedule-motion-layer.cpu-to-printer .primary-move { --motion-start-x: 50%; --motion-start-y: 38%; --motion-end-x: 50%; --motion-end-y: 89%; }
+  .schedule-motion-layer.disk-to-ready .primary-move { --motion-start-x: 50%; --motion-start-y: 72%; --motion-end-x: 50%; --motion-end-y: 9%; }
+  .schedule-motion-layer.printer-to-ready .primary-move { --motion-start-x: 50%; --motion-start-y: 89%; --motion-end-x: 50%; --motion-end-y: 9%; }
+  .schedule-motion-layer.cpu-to-done .primary-move { --motion-start-x: 50%; --motion-start-y: 38%; --motion-end-x: 50%; --motion-end-y: 55%; }
+  .schedule-motion-layer.add-ready .primary-move { left: 50%; top: 9%; }
+  .schedule-motion-layer.cpu-to-disk .auto-dispatch,
+  .schedule-motion-layer.cpu-to-printer .auto-dispatch { --motion-start-x: 50%; --motion-start-y: 9%; --motion-end-x: 50%; --motion-end-y: 38%; }
   .mutex-motion.enter .incoming,
   .semaphore-motion.enter .incoming { --motion-start-x: 50%; --motion-start-y: 18%; --motion-end-x: 50%; --motion-end-y: 82%; }
   .mutex-motion.handoff .incoming,
@@ -533,5 +614,6 @@ a { color: inherit; text-decoration: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
-  .lab-motion-layer { display: none; }
+  .lab-motion-layer,
+  .schedule-motion-layer { display: none; }
 }

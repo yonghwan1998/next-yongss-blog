@@ -20,6 +20,14 @@ const labs = [
     description: "카운팅 세마포의 wait·signal 연산과 제한된 자원의 분배 과정을 확인합니다.",
     tags: ["OS", "Synchronization"],
   },
+  {
+    href: "/labs/scheduling-queue",
+    number: "03",
+    title: "Scheduling Queue",
+    koreanTitle: "준비·실행·대기 큐의 상태 전이",
+    description: "디스패치, 타이머 인터럽트, I/O 요청과 완료에 따라 PCB가 큐 사이를 이동하는 과정을 확인합니다.",
+    tags: ["OS", "Scheduling"],
+  },
 ];
 
 export default function LabsPage() {
