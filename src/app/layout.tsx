@@ -5,10 +5,10 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Yongss Blog",
-    template: "%s | Yongss Blog",
+    default: "yongss Blog",
+    template: "%s | yongss Blog",
   },
-  description: "Research, development, and notes by Yongss.",
+  description: "Research, development, and notes by yongss.",
 };
 
 export default function RootLayout({

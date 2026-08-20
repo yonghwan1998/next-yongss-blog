@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "About",
-  description: "Yongss와 이 블로그를 소개합니다.",
+  description: "yongss와 이 블로그를 소개합니다.",
 };
 
 export default function AboutPage() {
