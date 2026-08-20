@@ -48,17 +48,18 @@ try {
     semaphore.release(); // signal(): 허가증 반환
 }`;
 
-const semaphorePseudoCode = `wait() {
+const semaphorePseudoCode = `wait() {                 // 전체를 원자적으로 실행
     S--;
     if (S < 0) {
-        sleep();
+        enqueue(current);
+        block(current);
     }
 }
 
-signal() {
+signal() {               // 전체를 원자적으로 실행
     S++;
     if (S <= 0) {
-        wakeup(process);
+        wakeup(dequeue());
     }
 }`;
 
@@ -80,10 +81,10 @@ export default function SynchronizationAndDeadlockPage() {
           <div><dt>공유 자원</dt><dd>여러 프로세스 또는 스레드가 함께 사용하는 자원</dd></div>
           <div><dt>임계 구역</dt><dd>공유 자원에 접근하는 코드 중 여러 프로세스 또는 스레드가 동시에 실행하면 문제가 발생할 수 있는 코드 영역</dd></div>
           <div><dt>레이스 컨디션</dt><dd>프로세스 또는 스레드가 공유 자원에 동시에 접근하고, 실행 순서에 따라 결과가 달라질 수 있는 상황</dd></div>
-          <div><dt>뮤텍스 락</dt><dd>동시에 접근해서는 안 되는 자원에 동시 접근이 불가능하도록 상호 배제를 보장하는 동기화 도구</dd></div>
-          <div><dt>세마포</dt><dd>뮤텍스와 유사하지만 여러 개의 프로세스 또는 스레드가 한정된 수의 자원을 이용할 때 사용하는 동기화 도구</dd></div>
-          <div><dt>모니터</dt><dd>공유 자원과 그 공유 자원을 다루는 함수 또는 인터페이스로 구성된 동기화 도구</dd></div>
-          <div><dt>스레드 안전</dt><dd>멀티스레드 환경에서 동시 접근이 발생해도 실행에 문제가 없는 상태</dd></div>
+          <div><dt>뮤텍스 락</dt><dd>락의 소유권을 바탕으로 한 번에 하나의 실행 흐름만 임계 구역에 진입하도록 보장하는 동기화 도구</dd></div>
+          <div><dt>세마포</dt><dd>정수형 카운터로 사용 가능한 허가증(permit)의 수를 관리해 동시 접근 수나 실행 순서를 제어하는 동기화 도구</dd></div>
+          <div><dt>모니터</dt><dd>공유 상태와 연산, 상호 배제, 조건 변수를 하나로 캡슐화한 고수준 동기화 추상화</dd></div>
+          <div><dt>스레드 안전</dt><dd>여러 스레드가 동시에 사용해도 명세된 결과와 공유 상태의 불변 조건이 유지되는 성질</dd></div>
         </dl>
         <aside className="article-callout"><strong>동기화가 필요한 이유</strong><p>프로세스 또는 스레드가 공유 메모리 등의 자원에 동시에 접근하면 예상하지 못한 결과가 발생할 수 있다. 임계 구역에 대한 접근을 제어해 공유 자원의 일관성을 보장해야 한다.</p></aside>
       </section>
@@ -108,8 +109,8 @@ export default function SynchronizationAndDeadlockPage() {
 
       <section className="article-section">
         <h2>뮤텍스 락</h2>
-        <p>뮤텍스(MUTual EXclusion)는 자원이 하나일 때 사용하는 동기화 도구다. 하나의 임계 구역에 한 번에 하나의 실행 흐름만 진입하도록 상호 배제를 보장한다.</p>
-        <ul><li>임계 구역에 접근하려면 반드시 락을 획득해야 한다.</li><li>이미 다른 실행 흐름이 락을 가지고 있다면 락이 해제될 때까지 기다린다.</li><li>임계 구역의 작업이 끝나면 반드시 락을 해제해야 한다.</li><li>예외가 발생해도 락이 해제되도록 일반적으로 <code>finally</code> 블록을 사용한다.</li></ul>
+        <p>뮤텍스(mutex, mutual exclusion)는 보호 대상의 개수와 관계없이 하나의 임계 구역에 한 번에 하나의 실행 흐름만 진입하도록 상호 배제를 보장한다. 핵심은 락을 획득한 실행 흐름이 소유자가 되고, 그 소유자만 락을 해제할 수 있다는 점이다.</p>
+        <ul><li>임계 구역에 접근하려면 반드시 락을 획득해야 한다.</li><li>이미 다른 실행 흐름이 락을 가지고 있다면 락이 해제될 때까지 기다린다.</li><li>락을 획득한 소유자만 해당 락을 해제해야 한다.</li><li>임계 구역의 작업이 끝나면 반드시 락을 해제해야 한다.</li><li>예외가 발생해도 락이 해제되도록 일반적으로 <code>finally</code> 블록을 사용한다.</li></ul>
         <pre><code>{mutexPseudoCode}</code></pre>
         <pre><code>{mutexCode}</code></pre>
         <MutexLab />
@@ -117,8 +118,9 @@ export default function SynchronizationAndDeadlockPage() {
 
       <section className="article-section">
         <h2>세마포</h2>
-        <p>세마포는 자원이 하나 이상일 때 사용하는 동기화 도구다. 뮤텍스와 비슷하지만 여러 프로세스나 스레드가 한정된 수의 공유 자원을 이용할 때 적합하다.</p>
-        <ul><li>사용 가능한 공유 자원의 개수를 내부 카운터 <code>S</code>로 관리한다.</li><li>카운터 값은 임계 구역에 동시에 진입할 수 있는 실행 흐름의 최대 개수와 연결된다.</li><li><code>wait()</code> 또는 P 연산은 카운터를 감소시키고, 자원이 없으면 호출한 실행 흐름을 대기시킨다.</li><li><code>signal()</code> 또는 V 연산은 카운터를 증가시키고, 기다리는 실행 흐름이 있으면 깨운다.</li></ul>
+        <p>세마포는 정수형 카운터로 사용 가능한 허가증의 수를 관리한다. 여러 개의 허가증으로 동시 접근 수를 제한할 수도 있고, 허가증이 하나뿐인 이진 세마포로 상호 배제를 구현할 수도 있다. 다만 뮤텍스와 달리 소유권 개념이 없어 허가증을 획득한 실행 흐름과 반환하는 실행 흐름이 반드시 같을 필요는 없다.</p>
+        <ul><li><strong>카운팅 세마포:</strong> 둘 이상의 허가증을 두고 자원 풀이나 동시 실행 수를 제한한다.</li><li><strong>이진 세마포:</strong> 허가증을 0과 1로 제한해 상호 배제나 실행 순서 제어에 사용한다.</li><li><code>wait()</code> 또는 P 연산은 허가증을 하나 획득한다. 사용할 허가증이 없으면 호출한 실행 흐름을 대기시킨다.</li><li><code>signal()</code> 또는 V 연산은 허가증을 하나 반환하고, 기다리는 실행 흐름이 있으면 하나를 깨운다.</li><li>카운터 검사와 변경, 대기 큐 이동이 중간에 끼어들 수 없는 하나의 원자적 연산으로 실행되어야 한다.</li></ul>
+        <p>아래 의사 코드에서 카운터 <code>S</code>가 음수라면 그 절댓값은 기다리는 실행 흐름의 수를 나타낸다. 실제 구현에서는 카운터 변경과 대기·깨우기 전환을 원자적으로 처리해 신호 유실을 막는다.</p>
         <pre><code>{semaphorePseudoCode}</code></pre>
         <pre><code>{semaphoreCode}</code></pre>
         <SemaphoreLab />
@@ -126,15 +128,16 @@ export default function SynchronizationAndDeadlockPage() {
 
       <section className="article-section">
         <h2>모니터</h2>
-        <p>모니터는 공유 자원과 그 자원을 다루는 함수 또는 인터페이스를 하나로 묶은 고수준 동기화 도구다. 세마포보다 사용하기 쉽게 만들어진 도구로 이해할 수 있다. 개발자가 락 획득과 해제를 직접 관리하는 뮤텍스보다 동기화 로직을 구조적으로 안전하게 캡슐화한다.</p>
+        <p>모니터는 공유 상태와 그 상태를 다루는 연산을 하나로 묶고, 한 번에 하나의 실행 흐름만 모니터 내부 연산을 수행하도록 보장하는 고수준 동기화 추상화다. 언어나 런타임이 모니터 진입과 이탈을 구조적으로 관리하므로 명시적인 락 해제를 빠뜨릴 가능성을 줄일 수 있다.</p>
+        <p>모니터는 단순한 상호 배제뿐 아니라 조건 변수 또는 대기 집합을 이용한 조건 동기화도 제공한다. 실행 조건이 충족되지 않은 흐름이 <code>wait()</code>를 호출하면 모니터 락을 놓고 대기하며, 알림을 받아 깨어난 뒤에는 락을 다시 획득해야 실행을 계속할 수 있다.</p>
         <div className="table-scroll"><table><thead><tr><th>구분</th><th>뮤텍스</th><th>모니터</th></tr></thead><tbody>
-          <tr><th>개념</th><td>락 기반 저수준 메커니즘</td><td>언어가 제공하는 고수준 구조</td></tr>
-          <tr><th>관리</th><td>개발자가 직접 획득·해제</td><td>컴파일러와 언어가 자동 관리</td></tr>
-          <tr><th>안정성</th><td>해제 누락 시 데드락 위험</td><td>자동 관리로 구조적 안전성 확보</td></tr>
-          <tr><th>코드 가독성</th><td>락 코드 때문에 비즈니스 로직이 복잡해질 수 있음</td><td>데이터와 동기화 로직이 캡슐화되어 비교적 간결함</td></tr>
-          <tr><th>조건 동기화</th><td>조건 변수를 생성해 직접 구현</td><td>모니터 내부 대기 큐로 제어</td></tr>
-          <tr><th>주요 활용</th><td>C/C++ 시스템 프로그래밍</td><td>Java synchronized, C# 등 언어 수준 객체</td></tr>
+          <tr><th>추상화 수준</th><td>락 획득과 해제를 직접 다루는 동기화 기본 요소</td><td>공유 상태·연산·동기화 정책을 묶은 고수준 구조</td></tr>
+          <tr><th>진입과 이탈</th><td>개발자가 정해진 위치에서 명시적으로 획득·해제</td><td>동기화된 메서드나 블록의 진입·종료와 함께 구조적으로 처리</td></tr>
+          <tr><th>조건 동기화</th><td>조건 변수 등의 도구를 별도로 결합</td><td>조건 변수나 대기 집합을 내부에 포함</td></tr>
+          <tr><th>오류 가능성</th><td>락 해제 누락이나 잘못된 소유자 해제를 주의</td><td>해제 누락은 줄지만 잘못된 락 순서로 인한 교착 상태는 여전히 가능</td></tr>
+          <tr><th>대표적인 예</th><td>POSIX mutex, Java <code>ReentrantLock</code></td><td>Java <code>synchronized</code>, C# <code>lock</code>·<code>Monitor</code></td></tr>
         </tbody></table></div>
+        <aside className="article-callout"><strong>세 도구의 핵심 차이</strong><p>뮤텍스는 하나의 소유자가 임계 구역을 보호하고, 세마포는 소유자 없이 허가증 수를 관리한다. 모니터는 상호 배제와 조건 동기화를 공유 상태 및 연산과 함께 구조적으로 캡슐화한다.</p></aside>
       </section>
 
       <section className="article-section">
