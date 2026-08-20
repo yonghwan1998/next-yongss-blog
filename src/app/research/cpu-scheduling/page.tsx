@@ -33,7 +33,7 @@ export default function CpuSchedulingPage() {
             <div><dt>CPU 스케줄러</dt><dd>스케줄링 알고리즘에 따라 준비 상태의 프로세스 중 하나를 선택하는 운영체제의 일부분</dd></div>
             <div><dt>CPU 활용률</dt><dd>전체 시간 중 CPU가 실제 작업을 처리한 시간의 비율</dd></div>
             <div><dt>CPU 버스트</dt><dd>프로세스가 CPU에서 명령을 연속으로 실행하는 구간</dd></div>
-            <div><dt>입출력 버스트</dt><dd>프로세스가 입출력 작업의 완료를 기다리는 구간</dd></div>
+            <div><dt>입출력 버스트</dt><dd>프로세스가 입출력을 요청한 뒤 장치가 작업을 수행하고 완료할 때까지의 구간</dd></div>
             <div><dt>CPU 집중 프로세스</dt><dd>전체 작업에서 CPU 연산이 차지하는 비중이 높은 프로세스</dd></div>
             <div><dt>입출력 집중 프로세스</dt><dd>짧은 CPU 작업과 입출력 대기를 자주 반복하는 프로세스</dd></div>
             <div><dt>준비 큐</dt><dd>CPU를 할당받을 준비가 된 프로세스의 PCB가 대기하는 큐</dd></div>
@@ -50,7 +50,7 @@ export default function CpuSchedulingPage() {
 
         <section className="article-section">
           <h2>CPU 집중 · 입출력 집중 프로세스</h2>
-          <p>대부분의 프로세스는 CPU 버스트와 입출력 버스트를 번갈아 거치며 실행 상태와 대기 상태를 오간다. CPU 집중 프로세스만 실행하면 입출력장치가 쉬고, 입출력 집중 프로세스만 실행하면 입출력을 기다리는 동안 CPU가 쉴 수 있다. 두 유형을 적절히 함께 실행해야 시스템 자원을 고르게 활용할 수 있다.</p>
+          <p>대부분의 프로세스는 CPU 버스트와 입출력 버스트를 번갈아 거치며 실행 상태와 대기 상태를 오간다. CPU 집중 프로세스의 비중이 지나치게 크면 입출력장치의 활용률이 낮아질 수 있고, 실행 가능한 입출력 집중 프로세스가 부족하면 입출력 완료를 기다리는 동안 CPU가 유휴 상태가 될 수 있다. 충분한 수의 프로세스가 서로의 대기 시간을 메우면 같은 유형만으로도 일부 유휴 시간을 줄일 수 있지만, 두 유형을 적절히 함께 실행하면 CPU와 입출력장치를 동시에 활용할 기회가 일반적으로 늘어난다.</p>
           <div className="table-scroll">
             <table>
               <thead><tr><th>구분</th><th>일반적인 동작</th></tr></thead>
@@ -62,17 +62,17 @@ export default function CpuSchedulingPage() {
               </tbody>
             </table>
           </div>
-          <p>입출력 집중 프로세스는 CPU 버스트가 짧아 CPU를 빠르게 반납하고 곧바로 입출력장치를 사용한다. 그래서 일반적으로 CPU 집중 프로세스보다 높은 우선순위를 부여하면 CPU와 입출력장치가 동시에 일할 기회가 늘어난다.</p>
+          <p>입출력 집중 프로세스는 CPU 버스트가 짧아 CPU를 빠르게 반납하고 곧바로 입출력장치를 사용한다. 대화형 작업의 응답성과 장치 활용률을 높이려는 정책에서는 입출력 집중 프로세스에 CPU 집중 프로세스보다 높은 우선순위를 부여하는 경우가 많다. 다만 이는 고정된 규칙이 아니라 시스템의 목표와 스케줄링 정책에 따른 선택이다.</p>
           <figure className="article-figure">
             <Image
-              alt="CPU 집중 프로세스 또는 입출력 집중 프로세스만 배치했을 때 CPU와 입출력장치가 유휴 상태가 되는 과정"
+              alt="한 유형의 프로세스만 있고 실행 가능한 작업이 부족할 때 CPU 또는 입출력장치가 유휴 상태가 되는 예시"
               height={940}
               priority
               sizes="(max-width: 1100px) 100vw, 820px"
               src="/images/cpu-scheduling/cpu-io-utilization.png"
               width={1680}
             />
-            <figcaption>한쪽 유형의 프로세스만 배치하면 일부 자원이 쉬면서 자원 활용률과 전체 처리량이 낮아진다.</figcaption>
+            <figcaption>실행 가능한 프로세스가 충분하지 않아 한쪽 자원이 기다리게 되는 단순화된 상황이다.</figcaption>
           </figure>
         </section>
 
@@ -122,14 +122,14 @@ export default function CpuSchedulingPage() {
           <h2>CPU 스케줄링 알고리즘</h2>
 
           <h3>1. 선입 선처리 스케줄링</h3>
-          <p>선입 선처리(FCFS, First-Come First-Served)는 준비 큐에 도착한 순서대로 CPU를 할당하는 비선점형 알고리즘이다. 구현이 단순하고 먼저 온 작업을 먼저 처리한다는 점에서 공평하지만, 실행 시간이 긴 프로세스가 앞에 있으면 짧은 프로세스들이 함께 오래 기다리는 <strong>호위 효과</strong>가 발생할 수 있다.</p>
+          <p>선입 선처리(FCFS, First-Come First-Served)는 준비 큐에 도착한 순서대로 CPU를 할당하는 비선점형 알고리즘이다. 구현이 단순하고 도착 순서에 일관된 결과를 제공하지만, 실행 시간이 긴 프로세스가 앞에 있으면 짧은 프로세스들이 함께 오래 기다리는 <strong>콘보이 효과(convoy effect, 호위 효과)</strong>가 발생할 수 있다.</p>
           <figure className="article-figure article-diagram">
             <Image alt="도착한 순서대로 프로세스 A, B, C, D를 실행하는 선입 선처리 스케줄링" height={900} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/fcfs.png" unoptimized width={1600} />
             <figcaption>실행 시간이 아니라 준비 큐에 들어온 순서가 CPU 할당 순서를 결정한다.</figcaption>
           </figure>
 
           <h3>2. 최단 작업 우선 스케줄링</h3>
-          <p>최단 작업 우선(SJF, Shortest Job First)은 준비 큐의 프로세스 가운데 예상 CPU 버스트가 가장 짧은 프로세스를 먼저 실행하는 비선점형 알고리즘이다. CPU 버스트를 정확히 안다면 평균 대기 시간을 최소화할 수 있지만, 운영체제는 미래의 실행 시간을 알 수 없으므로 과거 실행 기록을 이용해 예측한다. 짧은 작업이 계속 들어오면 긴 작업이 실행되지 못하는 <strong>기아</strong>가 생길 수 있다.</p>
+          <p>최단 작업 우선(SJF, Shortest Job First)은 준비 큐의 프로세스 가운데 예상 CPU 버스트가 가장 짧은 프로세스를 먼저 실행하는 비선점형 알고리즘이다. 모든 프로세스가 같은 선택 시점에 준비되어 있고 각 CPU 버스트를 정확히 안다는 조건에서는 비선점형 알고리즘 가운데 평균 대기 시간을 최소화한다. 하지만 실제 운영체제는 미래의 실행 시간을 알 수 없으므로 과거 실행 기록을 이용해 예측한다. 짧은 작업이 계속 들어오면 긴 작업이 실행되지 못하는 <strong>기아</strong>가 생길 수 있다.</p>
           <figure className="article-figure">
             <Image alt="도착 순서와 관계없이 실행 시간이 가장 짧은 프로세스 D를 선택하는 최단 작업 우선 스케줄링" height={512} sizes="(max-width: 1100px) 100vw, 820px" src="/images/cpu-scheduling/sjf.png" width={2112} />
             <figcaption>도착 순서가 늦어도 예상 실행 시간이 가장 짧은 프로세스를 우선한다.</figcaption>
@@ -182,7 +182,7 @@ export default function CpuSchedulingPage() {
             <table>
               <thead><tr><th>알고리즘</th><th>기본 형태</th><th>선택 기준</th><th>주요 강점</th><th>주의할 점</th></tr></thead>
               <tbody>
-                <tr><th>FCFS</th><td>비선점형</td><td>도착 순서</td><td>구현이 단순하고 전환 비용이 작음</td><td>호위 효과</td></tr>
+                <tr><th>FCFS</th><td>비선점형</td><td>도착 순서</td><td>구현이 단순하고 전환 비용이 작음</td><td>콘보이 효과(호위 효과)</td></tr>
                 <tr><th>SJF</th><td>비선점형</td><td>가장 짧은 예상 CPU 버스트</td><td>평균 대기 시간 단축</td><td>실행 시간 예측, 기아</td></tr>
                 <tr><th>라운드 로빈</th><td>선점형</td><td>도착 순서와 타임 슬라이스</td><td>대화형 작업의 응답성</td><td>타임 슬라이스 크기</td></tr>
                 <tr><th>SRTF</th><td>선점형</td><td>가장 짧은 남은 시간</td><td>짧은 작업의 대기·반환 시간 단축</td><td>실행 시간 예측, 기아</td></tr>
