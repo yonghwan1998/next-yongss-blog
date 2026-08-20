@@ -92,7 +92,7 @@ export default function SynchronizationAndDeadlockPage() {
         <h2>레이스 컨디션</h2>
         <p>둘 이상의 실행 흐름이 동시에 임계 구역의 코드를 실행하면 명령의 실제 실행 순서에 따라 결과가 달라진다. 이 상황을 레이스 컨디션이라고 하며, 공유 자원의 일관성이 손상될 수 있다.</p>
         <figure className="article-figure">
-          <Image alt="두 프로세스가 공유 자원의 값을 동시에 읽고 쓰면서 값 유실이 발생하는 레이스 컨디션 과정" height={768} priority src="/images/race-condition.png" width={1408} />
+          <Image alt="두 프로세스가 공유 자원의 값을 동시에 읽고 쓰면서 값 유실이 발생하는 레이스 컨디션 과정" height={768} priority src="/images/synchronization-and-deadlock/race-condition.png" width={1408} />
           <figcaption>두 프로세스가 값 10을 동시에 읽은 뒤 각각 11을 쓰면 한 번의 증가가 유실된다.</figcaption>
         </figure>
         <pre><code>{raceCode}</code></pre>
