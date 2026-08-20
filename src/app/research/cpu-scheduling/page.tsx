@@ -101,6 +101,24 @@ export default function CpuSchedulingPage() {
         </section>
 
         <section className="article-section">
+          <h2>스케줄링을 평가하는 기준</h2>
+          <p>CPU 스케줄링 알고리즘은 단순히 실행 순서만 다르게 만드는 것이 아니다. 어떤 알고리즘을 선택하느냐에 따라 시스템이 처리하는 작업의 양과 사용자가 느끼는 응답 속도가 달라진다. 운영체제는 작업의 성격에 맞춰 다음 지표 사이의 균형을 찾는다.</p>
+          <div className="table-scroll">
+            <table>
+              <thead><tr><th>평가 기준</th><th>의미</th><th>일반적인 목표</th></tr></thead>
+              <tbody>
+                <tr><th>CPU 활용률</th><td>전체 시간 중 CPU가 실제 작업을 수행한 시간의 비율</td><td>높이기</td></tr>
+                <tr><th>처리량</th><td>단위 시간 동안 완료한 프로세스의 수</td><td>높이기</td></tr>
+                <tr><th>반환 시간</th><td>프로세스가 도착한 시점부터 실행을 모두 마칠 때까지 걸린 전체 시간</td><td>줄이기</td></tr>
+                <tr><th>대기 시간</th><td>프로세스가 준비 큐에서 CPU 할당을 기다린 시간의 합</td><td>줄이기</td></tr>
+                <tr><th>응답 시간</th><td>프로세스가 도착하거나 요청을 보낸 뒤 첫 실행 또는 첫 응답이 시작될 때까지 걸린 시간</td><td>줄이기</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <aside className="article-callout"><strong>하나의 절대적인 정답은 없다</strong><p>배치 시스템은 처리량과 반환 시간을 중요하게 보고, 대화형 시스템은 짧은 응답 시간을 더 중요하게 본다. 문맥 교환 비용과 기아 가능성까지 고려해야 하므로 모든 지표를 동시에 최적화하는 하나의 알고리즘은 없다.</p></aside>
+        </section>
+
+        <section className="article-section">
           <h2>CPU 스케줄링 알고리즘</h2>
 
           <h3>1. 선입 선처리 스케줄링</h3>
@@ -162,18 +180,28 @@ export default function CpuSchedulingPage() {
           <h2>한눈에 비교하기</h2>
           <div className="table-scroll">
             <table>
-              <thead><tr><th>알고리즘</th><th>기본 형태</th><th>선택 기준</th><th>주의할 점</th></tr></thead>
+              <thead><tr><th>알고리즘</th><th>기본 형태</th><th>선택 기준</th><th>주요 강점</th><th>주의할 점</th></tr></thead>
               <tbody>
-                <tr><th>FCFS</th><td>비선점형</td><td>도착 순서</td><td>호위 효과</td></tr>
-                <tr><th>SJF</th><td>비선점형</td><td>가장 짧은 예상 CPU 버스트</td><td>실행 시간 예측, 기아</td></tr>
-                <tr><th>라운드 로빈</th><td>선점형</td><td>도착 순서와 타임 슬라이스</td><td>타임 슬라이스 크기</td></tr>
-                <tr><th>SRTF</th><td>선점형</td><td>가장 짧은 남은 시간</td><td>실행 시간 예측, 기아</td></tr>
-                <tr><th>우선순위</th><td>둘 다 가능</td><td>프로세스 우선순위</td><td>기아, 에이징 필요</td></tr>
-                <tr><th>다단계 큐</th><td>정책에 따라 다름</td><td>고정된 큐와 큐별 정책</td><td>낮은 큐의 기아</td></tr>
-                <tr><th>다단계 피드백 큐</th><td>주로 선점형</td><td>실행 행동에 따른 동적 우선순위</td><td>정책과 매개변수 설계가 복잡함</td></tr>
+                <tr><th>FCFS</th><td>비선점형</td><td>도착 순서</td><td>구현이 단순하고 전환 비용이 작음</td><td>호위 효과</td></tr>
+                <tr><th>SJF</th><td>비선점형</td><td>가장 짧은 예상 CPU 버스트</td><td>평균 대기 시간 단축</td><td>실행 시간 예측, 기아</td></tr>
+                <tr><th>라운드 로빈</th><td>선점형</td><td>도착 순서와 타임 슬라이스</td><td>대화형 작업의 응답성</td><td>타임 슬라이스 크기</td></tr>
+                <tr><th>SRTF</th><td>선점형</td><td>가장 짧은 남은 시간</td><td>짧은 작업의 대기·반환 시간 단축</td><td>실행 시간 예측, 기아</td></tr>
+                <tr><th>우선순위</th><td>둘 다 가능</td><td>프로세스 우선순위</td><td>중요하거나 긴급한 작업의 빠른 처리</td><td>기아, 에이징 필요</td></tr>
+                <tr><th>다단계 큐</th><td>정책에 따라 다름</td><td>고정된 큐와 큐별 정책</td><td>작업 유형별 정책 분리</td><td>낮은 큐의 기아</td></tr>
+                <tr><th>다단계 피드백 큐</th><td>주로 선점형</td><td>실행 행동에 따른 동적 우선순위</td><td>짧은 작업과 대화형 작업의 응답성</td><td>정책과 매개변수 설계가 복잡함</td></tr>
               </tbody>
             </table>
           </div>
+        </section>
+
+        <section className="article-section">
+          <h2>핵심 정리</h2>
+          <ul>
+            <li>CPU 스케줄러는 준비 상태의 프로세스 중 다음 실행 대상을 고른다.</li>
+            <li>선점형 방식은 응답성을 높일 수 있지만 문맥 교환 비용이 커질 수 있고, 비선점형 방식은 단순하지만 긴 작업이 CPU를 오래 점유할 수 있다.</li>
+            <li>평균 대기 시간을 줄이는 알고리즘, 빠른 응답을 제공하는 알고리즘, 작업 유형별 정책을 적용하는 알고리즘은 서로 다른 목표를 가진다.</li>
+            <li>실제 운영체제는 하나의 알고리즘만 고집하기보다 작업 특성과 실행 행동을 반영한 복합적인 정책을 사용한다.</li>
+          </ul>
         </section>
       </article>
       <TableOfContents />
