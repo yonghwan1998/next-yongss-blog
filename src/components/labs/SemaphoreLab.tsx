@@ -4,6 +4,14 @@ import { useState } from "react";
 
 type TaskState = "ready" | "waiting" | "running" | "done";
 type TaskItem = { id: number; state: TaskState };
+type MotionType = "enter" | "queue" | "handoff" | "release" | "add" | "blocked";
+type Motion = {
+  sequence: number;
+  type: MotionType;
+  id?: number;
+  releasedId?: number;
+  label: string;
+};
 const CAPACITY = 3;
 const initialTasks = (): TaskItem[] => [1, 2, 3, 4, 5].map((id) => ({ id, state: "ready" }));
 
@@ -13,20 +21,28 @@ export default function SemaphoreLab() {
   const [queue, setQueue] = useState<number[]>([]);
   const [nextId, setNextId] = useState(6);
   const [message, setMessage] = useState("허가증이 있는 동안 여러 태스크가 동시에 진입할 수 있습니다.");
+  const [motion, setMotion] = useState<Motion | null>(null);
   const permits = CAPACITY - running.length;
+
+  const playMotion = (next: Omit<Motion, "sequence">) => {
+    setMotion((current) => ({ ...next, sequence: (current?.sequence ?? 0) + 1 }));
+  };
 
   const wait = () => {
     const target = tasks.find((task) => task.state === "ready");
     if (!target) {
+      playMotion({ type: "blocked", label: "진입할 태스크 없음" });
       setMessage("새 태스크를 추가하거나 허가증을 반환하세요.");
       return;
     }
     if (running.length < CAPACITY) {
+      playMotion({ type: "enter", id: target.id, label: "permit 획득" });
       setRunning((items) => [...items, target.id]);
       setTasks((items) => items.map((item) => item.id === target.id ? { ...item, state: "running" } : item));
       setMessage(`T${target.id}이 허가증을 획득했습니다. 남은 허가증은 ${permits - 1}개입니다.`);
       return;
     }
+    playMotion({ type: "queue", id: target.id, label: "FIFO 대기열로" });
     setQueue((items) => [...items, target.id]);
     setTasks((items) => items.map((item) => item.id === target.id ? { ...item, state: "waiting" } : item));
     setMessage(`허가증이 없어 T${target.id}은 대기 큐로 이동했습니다.`);
@@ -35,10 +51,14 @@ export default function SemaphoreLab() {
   const signal = () => {
     const released = running[0];
     if (released === undefined) {
+      playMotion({ type: "blocked", label: "반환할 permit 없음" });
       setMessage("반환할 허가증이 없습니다.");
       return;
     }
     const next = queue[0];
+    playMotion(next === undefined
+      ? { type: "release", id: released, label: "permit 반환" }
+      : { type: "handoff", id: next, releasedId: released, label: "permit 전달" });
     setRunning((items) => next === undefined ? items.slice(1) : [...items.slice(1), next]);
     setQueue((items) => items.slice(1));
     setTasks((items) => items.map((item) => {
@@ -50,6 +70,7 @@ export default function SemaphoreLab() {
   };
 
   const addTask = () => {
+    playMotion({ type: "add", id: nextId, label: "준비 상태에 추가" });
     setTasks((items) => [...items, { id: nextId, state: "ready" }]);
     setNextId((id) => id + 1);
     setMessage(`T${nextId}을 준비 큐에 추가했습니다.`);
@@ -57,6 +78,7 @@ export default function SemaphoreLab() {
 
   const reset = () => {
     setTasks(initialTasks()); setRunning([]); setQueue([]); setNextId(6);
+    setMotion(null);
     setMessage("허가증이 있는 동안 여러 태스크가 동시에 진입할 수 있습니다.");
   };
 
@@ -66,12 +88,19 @@ export default function SemaphoreLab() {
         <div><span>Interactive Lab</span><h3 id="semaphore-lab-title">여러 허가증, 제한된 동시 접근</h3></div>
         <button className="lab-button subtle" onClick={reset} type="button">초기화</button>
       </div>
-      <div className="permit-summary"><span>현재 카운터</span><strong>{permits}</strong><small> / {CAPACITY}</small></div>
-      <div className="permit-slots">{Array.from({ length: CAPACITY }, (_, index) => <div className={running[index] ? "used" : ""} key={index}>{running[index] ? `T${running[index]} 사용 중` : "사용 가능"}</div>)}</div>
+      <div className="permit-summary"><span>현재 카운터</span><strong key={permits}>{permits}</strong><small> / {CAPACITY}</small></div>
+      <div className="permit-slots">{Array.from({ length: CAPACITY }, (_, index) => <div className={running[index] ? "used" : ""} key={`${index}-${running[index] ?? "free"}`}>{running[index] ? `T${running[index]} 사용 중` : "사용 가능"}</div>)}</div>
       <div className="lab-workspace semaphore-workspace">
+        {motion && (
+          <div className={`lab-motion-layer semaphore-motion ${motion.type}`} key={motion.sequence} aria-hidden="true">
+            <span className="lab-motion-caption">{motion.label}</span>
+            {motion.id !== undefined && <span className="lab-motion-badge incoming">T{motion.id}</span>}
+            {motion.releasedId !== undefined && <span className="lab-motion-badge outgoing">T{motion.releasedId}</span>}
+          </div>
+        )}
         <div className="lab-zone">
           <div className="lab-zone-title"><span>Ready / Waiting</span><span>대기 {queue.length}</span></div>
-          <div className="lab-task-list">{tasks.filter((item) => item.state === "ready" || item.state === "waiting").map((item) => <Task key={item.id} task={item} />)}</div>
+          <div className="lab-task-list">{tasks.filter((item) => item.state === "ready" || item.state === "waiting").map((item) => <Task key={`${item.id}-${item.state}`} task={item} />)}</div>
           <div className="lab-queue"><span>FIFO Queue</span><div>{queue.length ? queue.map((id) => <b key={id}>T{id}</b>) : <small>비어 있음</small>}</div></div>
         </div>
         <div className="lab-zone critical">
@@ -84,7 +113,7 @@ export default function SemaphoreLab() {
         <button className="lab-button" onClick={signal} type="button">V · signal()</button>
         <button className="lab-button" onClick={addTask} type="button">+ 태스크 추가</button>
       </div>
-      <p className="lab-message" aria-live="polite">{message}</p>
+      <p className="lab-message" aria-live="polite"><span key={motion?.sequence ?? 0}>{message}</span></p>
     </section>
   );
 }
