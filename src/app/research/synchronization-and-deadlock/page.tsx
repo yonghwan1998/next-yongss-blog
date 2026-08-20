@@ -1,11 +1,51 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import ArticleReferences from "@/components/ArticleReferences";
 import MutexLab from "@/components/labs/MutexLab";
 import SemaphoreLab from "@/components/labs/SemaphoreLab";
 import TableOfContents from "@/components/TableOfContents";
 
 export const metadata: Metadata = { title: "동기화와 교착 상태", description: "레이스 컨디션, 동기화 도구와 교착 상태의 원리 및 해결 방법을 정리합니다." };
+
+const references = [
+  {
+    description: "강민철, 한빛미디어(2024). 운영체제 장의 동기화 기법과 교착 상태 설명을 참고했다.",
+    href: "https://www.hanbit.co.kr/books/B3079890360?code=B3079890360",
+    source: "도서 · 한빛미디어",
+    title: "이것이 취업을 위한 컴퓨터 과학이다 with CS 기술 면접",
+  },
+  // {
+  //   description: "POSIX mutex의 소유권, 잠금, 대기와 해제 동작을 정의한다.",
+  //   href: "https://pubs.opengroup.org/onlinepubs/9799919799/functions/pthread_mutex_lock.html",
+  //   source: "POSIX.1-2024",
+  //   title: "pthread_mutex_lock, pthread_mutex_trylock, pthread_mutex_unlock",
+  // },
+  // {
+  //   description: "세마포의 값과 잠금·해제 연산, 값이 0일 때의 대기 동작을 정의한다.",
+  //   href: "https://pubs.opengroup.org/onlinepubs/9799919799/basedefs/V1_chap04.html#tag_04_20",
+  //   source: "POSIX.1-2024",
+  //   title: "General Concepts — Semaphore",
+  // },
+  // {
+  //   description: "락의 구현 목적과 상호 배제, 락을 평가하는 기준을 설명한다.",
+  //   href: "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-locks.pdf",
+  //   source: "OSTEP",
+  //   title: "Locks",
+  // },
+  // {
+  //   description: "이진·카운팅 세마포와 wait·post 연산을 여러 동기화 문제에 적용한다.",
+  //   href: "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-sema.pdf",
+  //   source: "OSTEP",
+  //   title: "Semaphores",
+  // },
+  // {
+  //   description: "교착 상태의 네 가지 필요 조건과 예방·회피·검출 전략을 다룬다.",
+  //   href: "https://pages.cs.wisc.edu/~remzi/OSTEP/threads-bugs.pdf",
+  //   source: "OSTEP",
+  //   title: "Common Concurrency Problems",
+  // },
+] as const;
 
 const raceCode = `public class Race {
     static int sharedData = 0;
@@ -189,6 +229,11 @@ export default function SynchronizationAndDeadlockPage() {
           <li>교착 상태 해결 전략은 예방, 회피, 검출 후 회복, 무시로 나뉘며 시스템 특성과 관리 비용에 따라 선택한다.</li>
         </ul>
       </section>
+
+      <ArticleReferences
+        imageDisclosure="이 글의 일부 설명용 이미지는 생성형 AI를 활용해 제작했다. 기술 내용과 표기는 게시 전에 작성자가 검토하고 수정했다."
+        references={references}
+      />
       </article>
       <TableOfContents />
     </div>

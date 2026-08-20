@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import ArticleReferences from "@/components/ArticleReferences";
 import SchedulingQueueLab from "@/components/labs/SchedulingQueueLab";
 import TableOfContents from "@/components/TableOfContents";
 
@@ -8,6 +9,33 @@ export const metadata: Metadata = {
   title: "CPU 스케줄링",
   description: "CPU·입출력 버스트와 스케줄링 큐부터 선점 여부, 주요 CPU 스케줄링 알고리즘까지 정리합니다.",
 };
+
+const references = [
+  {
+    description: "강민철, 한빛미디어(2024). 운영체제 장의 CPU 스케줄링 개념과 기술 면접 관점의 설명을 참고했다.",
+    href: "https://www.hanbit.co.kr/books/B3079890360?code=B3079890360",
+    source: "도서 · 한빛미디어",
+    title: "이것이 취업을 위한 컴퓨터 과학이다 with CS 기술 면접",
+  },
+  // {
+  //   description: "FCFS, SJF, SRTF, 라운드 로빈과 스케줄링 평가 지표를 설명한다.",
+  //   href: "https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-sched.pdf",
+  //   source: "OSTEP",
+  //   title: "Scheduling: Introduction",
+  // },
+  // {
+  //   description: "다단계 피드백 큐의 우선순위 조정, 강등과 주기적 부스트 원리를 다룬다.",
+  //   href: "https://pages.cs.wisc.edu/~remzi/OSTEP/cpu-sched-mlfq.pdf",
+  //   source: "OSTEP",
+  //   title: "Scheduling: The Multi-Level Feedback Queue",
+  // },
+  // {
+  //   description: "현대 Linux의 공정 스케줄링에 사용되는 가상 실행 시간, 지연과 가상 마감 시간의 관계를 설명한다.",
+  //   href: "https://docs.kernel.org/scheduler/sched-eevdf.html",
+  //   source: "Linux Kernel Documentation",
+  //   title: "EEVDF Scheduler",
+  // },
+] as const;
 
 export default function CpuSchedulingPage() {
   return (
@@ -203,6 +231,11 @@ export default function CpuSchedulingPage() {
             <li>실제 운영체제는 하나의 알고리즘만 고집하기보다 작업 특성과 실행 행동을 반영한 복합적인 정책을 사용한다.</li>
           </ul>
         </section>
+
+        <ArticleReferences
+          imageDisclosure="이 글의 일부 설명용 이미지는 생성형 AI를 활용해 제작했다. 기술 내용과 표기는 게시 전에 작성자가 검토하고 수정했다."
+          references={references}
+        />
       </article>
       <TableOfContents />
     </div>
