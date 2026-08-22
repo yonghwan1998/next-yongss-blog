@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import ArticleReferences from "@/components/ArticleReferences";
+import DeepResearch from "@/components/DeepResearch";
 import MutexLab from "@/components/labs/MutexLab";
 import SemaphoreLab from "@/components/labs/SemaphoreLab";
 import TableOfContents from "@/components/TableOfContents";
@@ -229,6 +230,23 @@ export default function SynchronizationAndDeadlockPage() {
           <li>교착 상태 해결 전략은 예방, 회피, 검출 후 회복, 무시로 나뉘며 시스템 특성과 관리 비용에 따라 선택한다.</li>
         </ul>
       </section>
+
+      <DeepResearch
+        items={[
+          {
+            question: "교착 상태 탐지 알고리즘은 어떤 주기로 실행해야 할까?",
+            answer: (
+              <p>모든 시스템에 맞는 고정 주기는 없다. 교착 상태가 자주 발생하거나 복구 비용이 크면 짧게, 탐지 자체의 CPU 비용이 크고 발생 가능성이 낮으면 길게 잡는다. 실무에서는 일정 주기만 고집하기보다 <strong>대기 시간 초과, 자원 사용률, 대기 그래프 변화</strong> 같은 신호가 생겼을 때 탐지를 실행하는 방식도 함께 사용한다.</p>
+            ),
+          },
+          {
+            question: "라이브락이란 무엇일까?",
+            answer: (
+              <p>여러 실행 흐름이 멈추지는 않았지만 서로에게 양보하거나 계속 상태를 바꾸느라 실제 작업을 끝내지 못하는 상태다. 서로 락을 쥔 채 멈춘 교착 상태와 달리 계속 움직인다는 점이 핵심이다. 재시도 사이에 무작위 지연이나 서로 다른 백오프 시간을 두어 같은 충돌이 반복되는 것을 줄일 수 있다.</p>
+            ),
+          },
+        ]}
+      />
 
       <ArticleReferences
         imageDisclosure="이 글의 일부 설명용 이미지는 생성형 AI를 활용해 제작했다. 기술 내용과 표기는 게시 전에 작성자가 검토하고 수정했다."

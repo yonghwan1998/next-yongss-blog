@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import ArticleReferences from "@/components/ArticleReferences";
+import DeepResearch from "@/components/DeepResearch";
 import SchedulingQueueLab from "@/components/labs/SchedulingQueueLab";
 import TableOfContents from "@/components/TableOfContents";
 
@@ -231,6 +232,23 @@ export default function CpuSchedulingPage() {
             <li>실제 운영체제는 하나의 알고리즘만 고집하기보다 작업 특성과 실행 행동을 반영한 복합적인 정책을 사용한다.</li>
           </ul>
         </section>
+
+        <DeepResearch
+          items={[
+            {
+              question: "선점형과 비선점형 중 어떤 방식이 더 많이 쓰일까?",
+              answer: (
+                <p>데스크톱·모바일·서버처럼 여러 작업의 응답성이 중요한 범용 운영체제에서는 <strong>선점형 스케줄링</strong>이 주로 쓰인다. 다만 커널의 일부 임계 구역이나 단순한 임베디드 시스템처럼 실행 예측 가능성과 작은 전환 비용이 중요한 곳에서는 비선점형 방식도 사용된다.</p>
+              ),
+            },
+            {
+              question: "데이터베이스의 파티션도 스케줄링과 관련이 있을까?",
+              answer: (
+                <p>직접적인 CPU 스케줄링 기법은 아니다. 파티셔닝은 큰 테이블이나 인덱스를 기준에 따라 나누는 <strong>데이터 배치 전략</strong>이다. 다만 쿼리 실행기가 필요한 파티션만 읽는 파티션 프루닝을 적용하면 처리할 작업과 입출력이 줄어들어, 결과적으로 DB 작업의 실행 순서와 자원 배분 부담에는 영향을 줄 수 있다.</p>
+              ),
+            },
+          ]}
+        />
 
         <ArticleReferences
           imageDisclosure="이 글의 일부 설명용 이미지는 생성형 AI를 활용해 제작했다. 기술 내용과 표기는 게시 전에 작성자가 검토하고 수정했다."
